@@ -1,5 +1,3 @@
-from beem.account import Account
-from beem.amount import Amount
 from beem.comment import Comment
 from beem import Steem
 from beem.instance import set_shared_steem_instance
@@ -8,15 +6,13 @@ from beem.blockchain import Blockchain
 from beem.vote import Vote
 from beem.utils import formatTimeString, addTzInfo, construct_authorperm
 from datetime import datetime, timedelta
-import re
 import time
 import os
 import json
-from steembi.transfer_ops_storage import TransferTrx, AccountTrx, MemberHistDB, CurationOptimizationTrx
+from steembi.transfer_ops_storage import MemberHistDB, CurationOptimizationTrx
 from steembi.storage import TrxDB, MemberDB, ConfigurationDB, AccountsDB
 from steembi.member import Member
 import dataset
-from steembi.memo_parser import MemoParser
 
 if __name__ == "__main__":
     config_file = 'config.json'

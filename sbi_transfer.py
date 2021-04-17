@@ -1,17 +1,14 @@
 from beem.account import Account
 from beem.amount import Amount
 from beem import Steem
-from beem.instance import set_shared_steem_instance
 from beem.nodelist import NodeList
 from beem.utils import formatTimeString
-import re
 import os
 import json
 import time
-from time import sleep
 from steembi.parse_hist_op import ParseAccountHist
 from steembi.storage import TrxDB, MemberDB, TransactionMemoDB, TransactionOutDB, KeysDB, AccountsDB, ConfigurationDB
-from steembi.transfer_ops_storage import TransferTrx, AccountTrx
+from steembi.transfer_ops_storage import AccountTrx
 import dataset
 from datetime import datetime
 from steembi.member import Member

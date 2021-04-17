@@ -4,7 +4,6 @@ import json
 from steembi.storage import TrxDB, MemberDB
 from steembi.transfer_ops_storage import AccountTrx
 
-
 if __name__ == "__main__":
     config_file = 'config.json'
     if not os.path.isfile(config_file):
@@ -24,7 +23,7 @@ if __name__ == "__main__":
     # Create keyStorage
     trxStorage = TrxDB(db2)
     memberStorage = MemberDB(db2)
-    
+
     # Update current node list from @fullnodeupdate
     data = trxStorage.get_all_data()
     status = {}
@@ -51,7 +50,7 @@ if __name__ == "__main__":
     print("share_types:")
     for s in share_type:
         print("%d share_type entries with %s" % (share_type[s], s))
-        
+
     accountTrx = {}
     for account in accounts:
         accountTrx[account] = AccountTrx(db, account)
@@ -62,5 +61,3 @@ if __name__ == "__main__":
             continue
         if op["index"] - last_index:
             start_index = last_index
-            
-        

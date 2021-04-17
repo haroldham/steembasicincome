@@ -13,8 +13,6 @@ from steembi.storage import TrxDB, MemberDB, ConfigurationDB, KeysDB, Transactio
 from steembi.transfer_ops_storage import TransferTrx, AccountTrx
 from steembi.member import Member
 
-
-
 if __name__ == "__main__":
     config_file = 'config.json'
     if not os.path.isfile(config_file):
@@ -27,11 +25,11 @@ if __name__ == "__main__":
         databaseConnector2 = config_data["databaseConnector2"]
         mgnt_shares = config_data["mgnt_shares"]
         hive_blockchain = config_data["hive_blockchain"]
-        
+
     start_prep_time = time.time()
     db2 = dataset.connect(databaseConnector2)
     db = dataset.connect(databaseConnector)
-    transferStorage = TransferTrx(db)    
+    transferStorage = TransferTrx(db)
     # Create keyStorage
     trxStorage = TrxDB(db2)
     keyStorage = KeysDB(db2)
@@ -44,10 +42,10 @@ if __name__ == "__main__":
     accountStorage = AccountsDB(db2)
     accounts = accountStorage.get()
     accounts_data = accountStorage.get_data()
-    other_accounts = accountStorage.get_transfer()     
-    
+    other_accounts = accountStorage.get_transfer()
+
     conf_setup = confStorage.get()
-    
+
     last_cycle = conf_setup["last_cycle"]
     share_cycle_min = conf_setup["share_cycle_min"]
     sp_share_ratio = conf_setup["sp_share_ratio"]
@@ -59,30 +57,27 @@ if __name__ == "__main__":
     last_delegation_check = conf_setup["last_delegation_check"]
     minimum_vote_threshold = conf_setup["minimum_vote_threshold"]
     upvote_multiplier_adjusted = conf_setup["upvote_multiplier_adjusted"]
-    
+
     accountTrx = {}
     for account in accounts:
         if account == "steembasicincome":
             accountTrx["sbi"] = AccountTrx(db, "sbi")
         else:
-            accountTrx[account] = AccountTrx(db, account)    
+            accountTrx[account] = AccountTrx(db, account)
 
-    
-    
-    print("sbi_update_curation_rshares: last_cycle: %s - %.2f min" % (formatTimeString(last_cycle), (datetime.utcnow() - last_cycle).total_seconds() / 60))
-    print("last_paid_post: %s - last_paid_comment: %s" % (formatTimeString(last_paid_post), formatTimeString(last_paid_comment)))
+    print("sbi_update_curation_rshares: last_cycle: %s - %.2f min" % (
+    formatTimeString(last_cycle), (datetime.utcnow() - last_cycle).total_seconds() / 60))
+    print("last_paid_post: %s - last_paid_comment: %s" % (
+    formatTimeString(last_paid_post), formatTimeString(last_paid_comment)))
 
     if (datetime.utcnow() - last_cycle).total_seconds() > 60 * share_cycle_min:
-        
-        
+
         new_cycle = (datetime.utcnow() - last_cycle).total_seconds() > 60 * share_cycle_min
         current_cycle = last_cycle + timedelta(seconds=60 * share_cycle_min)
-        
-        
+
         print("Update member database, new cycle: %s" % str(new_cycle))
         member_accounts = memberStorage.get_all_accounts()
 
-        
         nodes = NodeList()
         nodes.update_nodes()
         stm = Steem(node=nodes.get_nodes(hive=hive_blockchain))
@@ -90,12 +85,11 @@ if __name__ == "__main__":
 
         member_data = {}
         n_records = 0
-        share_age_member = {}    
+        share_age_member = {}
         for m in member_accounts:
             member_data[m] = Member(memberStorage.get(m))
 
-
-        if True:    
+        if True:
             print("reward voted steembasicincome post and comments")
 
             if last_paid_post is None:
@@ -104,16 +98,16 @@ if __name__ == "__main__":
             if last_paid_comment is None:
                 last_paid_comment = datetime(2018, 8, 9, 3, 36, 48)
             new_paid_comment = last_paid_comment
-            
+
             for account in accounts:
                 last_paid_post = conf_setup["last_paid_post"]
-                last_paid_comment = conf_setup["last_paid_post"]                
-                
+                last_paid_comment = conf_setup["last_paid_post"]
+
                 if accounts_data[account]["last_paid_comment"] is not None:
                     last_paid_comment = accounts_data[account]["last_paid_comment"]
                 if accounts_data[account]["last_paid_post"] is not None:
-                    last_paid_post = accounts_data[account]["last_paid_post"]                
-                
+                    last_paid_post = accounts_data[account]["last_paid_post"]
+
                 account = Account(account, steem_instance=stm)
                 if last_paid_post < last_paid_comment:
                     oldest_timestamp = last_paid_post
@@ -131,7 +125,7 @@ if __name__ == "__main__":
                         created = formatTimeString(comment["timestamp"])
                     except:
                         op_dict = op["op_dict"]
-                        comment = json.loads(op_dict[:op_dict.find("body")-3] + '}')
+                        comment = json.loads(op_dict[:op_dict.find("body") - 3] + '}')
                     try:
                         comment = Comment(comment, steem_instance=stm)
                         comment.refresh()
@@ -142,22 +136,21 @@ if __name__ == "__main__":
                         continue
                     if comment["author"] != account["name"]:
                         continue
-                    
+
                     if comment["parent_author"] == "" and created > addTzInfo(last_paid_post):
-                        print("add post %s" %  comment["authorperm"])
+                        print("add post %s" % comment["authorperm"])
                         blog.append(comment["authorperm"])
                     elif comment["parent_author"] != "" and created > addTzInfo(last_paid_comment):
-                        print("add comment %s" %  comment["authorperm"])
+                        print("add comment %s" % comment["authorperm"])
                         posts.append(comment["authorperm"])
-    
-    
+
                 post_rshares = 0
                 for authorperm in blog:
                     post = Comment(authorperm, steem_instance=stm)
                     print("Checking post %s" % post["authorperm"])
                     if post["created"] > addTzInfo(new_paid_post):
-                        new_paid_post = post["created"].replace(tzinfo=None) 
-                    last_paid_post = post["created"].replace(tzinfo=None) 
+                        new_paid_post = post["created"].replace(tzinfo=None)
+                    last_paid_post = post["created"].replace(tzinfo=None)
                     all_votes = ActiveVotes(post["authorperm"], steem_instance=stm2)
                     for vote in all_votes:
                         if vote["voter"] in member_data:
@@ -174,18 +167,17 @@ if __name__ == "__main__":
                             member_data[vote["voter"]]["balance_rshares"] += rshares
                             post_rshares += rshares
 
-            
                 comment_rshares = 0
                 for authorperm in posts:
                     post = Comment(authorperm, steem_instance=stm)
                     if post["created"] > addTzInfo(new_paid_comment):
                         new_paid_comment = post["created"].replace(tzinfo=None)
-                    last_paid_comment = post["created"].replace(tzinfo=None) 
+                    last_paid_comment = post["created"].replace(tzinfo=None)
                     all_votes = ActiveVotes(post["authorperm"], steem_instance=stm2)
                     for vote in all_votes:
                         if vote["voter"] in member_data:
                             if member_data[vote["voter"]]["shares"] <= 0:
-                                continue                    
+                                continue
                             rshares = vote["rshares"]
                             if rshares < 50000000:
                                 continue
@@ -208,5 +200,4 @@ if __name__ == "__main__":
         for acc in accounts_data:
             accountStorage.update(accounts_data[acc])
 
-        
     print("update curation rshares script run %.2f s" % (time.time() - start_prep_time))

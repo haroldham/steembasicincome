@@ -10,31 +10,38 @@ from steembi.transfer_ops_storage import TransferTrx, AccountTrx
 
 
 def memo_sp_delegation(new_shares, sp_per_share):
-    memo = "Thank you for your SP delegation! Your shares have increased by %d (%d SP = +1 bonus share)" % (new_shares, sp_per_share)
+    memo = "Thank you for your SP delegation! Your shares have increased by %d (%d SP = +1 bonus share)" % (
+    new_shares, sp_per_share)
     return memo
+
 
 def memo_sp_adjustment(shares, sp_per_share):
     memo = "@steembasicincome has adjusted your shares according to your recalled delegation."
-    memo += "If you decide to delegate again, %dSP = +1 bonus share. You still have %d shares and will continue to receive upvotes" % (sp_per_share, shares)
+    memo += "If you decide to delegate again, %dSP = +1 bonus share. You still have %d shares and will continue to receive upvotes" % (
+    sp_per_share, shares)
     return memo
+
 
 def memo_welcome():
     memo = "Your enrollment to Steem Basic Income has been processed."
     return memo
 
+
 def memo_sponsoring(sponsor):
     memo = "Congratulations! thanks to @%s you have been enrolled in Steem Basic Income." % (sponsor)
     memo += "Learn more at https://steemit.com/basicincome/@steembasicincome/steem-basic-income-a-complete-overview"
+
 
 def memo_update_shares(shares):
     memo = "Your Steem Basic Income has been increased. You now have %d shares!" % shares
     return memo
 
+
 def memo_sponsoring_update_shares(sponsor, shares):
     memo = "Congratulations! thanks to @%s your Steem Basic Income has been increased. You now have " % sponsor
     memo += "%d shares! Learn more at https://steemit.com/basicincome/@steembasicincome/steem-basic-income-a-complete-overview" % shares
     return memo
-    
+
 
 if __name__ == "__main__":
     config_file = 'config.json'
@@ -48,11 +55,11 @@ if __name__ == "__main__":
         databaseConnector2 = config_data["databaseConnector2"]
         mgnt_shares = config_data["mgnt_shares"]
         hive_blockchain = config_data["hive_blockchain"]
-        
+
     start_prep_time = time.time()
     db2 = dataset.connect(databaseConnector2)
     db = dataset.connect(databaseConnector)
-    transferStorage = TransferTrx(db)    
+    transferStorage = TransferTrx(db)
     # Create keyStorage
     trxStorage = TrxDB(db2)
     keyStorage = KeysDB(db2)
@@ -63,10 +70,10 @@ if __name__ == "__main__":
 
     accountStorage = AccountsDB(db2)
     accounts = accountStorage.get()
-    other_accounts = accountStorage.get_transfer()     
-    
+    other_accounts = accountStorage.get_transfer()
+
     conf_setup = confStorage.get()
-    
+
     last_cycle = conf_setup["last_cycle"]
     share_cycle_min = conf_setup["share_cycle_min"]
     sp_share_ratio = conf_setup["sp_share_ratio"]
@@ -77,13 +84,13 @@ if __name__ == "__main__":
     last_delegation_check = conf_setup["last_delegation_check"]
     minimum_vote_threshold = conf_setup["minimum_vote_threshold"]
     upvote_multiplier_adjusted = conf_setup["upvote_multiplier_adjusted"]
-    
+
     accountTrx = {}
     for account in accounts:
         if account == "steembasicincome":
             accountTrx["sbi"] = AccountTrx(db, "sbi")
         else:
-            accountTrx[account] = AccountTrx(db, account)    
+            accountTrx[account] = AccountTrx(db, account)
 
     data = trxStorage.get_all_data()
     data = sorted(data, key=lambda x: (datetime.utcnow() - x["timestamp"]).total_seconds(), reverse=True)
@@ -91,22 +98,22 @@ if __name__ == "__main__":
     key = keyStorage.get("steembasicincome", "memo")
     if key is not None:
         key_list.append(key["wif"])
-    #print(key_list)
+    # print(key_list)
     nodes = NodeList()
     try:
         nodes.update_nodes()
     except:
-        print("could not update nodes")        
+        print("could not update nodes")
     stm = Steem(keys=key_list, node=nodes.get_nodes(hive=hive_blockchain))
 
-    if False: # check if member are blacklisted
+    if False:  # check if member are blacklisted
         member_accounts = memberStorage.get_all_accounts()
         member_data = {}
         n_records = 0
-        share_age_member = {}    
+        share_age_member = {}
         for m in member_accounts:
             member_data[m] = Member(memberStorage.get(m))
-        
+
         for m in member_data:
             response = requests.get("http://blacklist.usesteem.com/user/%s" % m)
             if "blacklisted" in response.json():
@@ -118,27 +125,27 @@ if __name__ == "__main__":
                     member_data[m]["buildawhale"] = True
                 else:
                     member_data[m]["buildawhale"] = False
-            
-        
+
         print("write member database")
         member_data_list = []
         for m in member_data:
             member_data_list.append(member_data[m])
         memberStorage.add_batch(member_data_list)
-        member_data_list = []            
-    if False: # LessOrNoSponsee
-        memo_parser = MemoParser(steem_instance=stm)            
+        member_data_list = []
+    if False:  # LessOrNoSponsee
+        memo_parser = MemoParser(steem_instance=stm)
         for op in data:
             if op["status"] != "LessOrNoSponsee":
                 continue
             processed_memo = ascii(op["memo"]).replace('\n', '').replace('\\n', '').replace('\\', '')
-            print(processed_memo)                
+            print(processed_memo)
             if processed_memo[1] == '@':
                 processed_memo = processed_memo[1:-1]
-                
+
             if processed_memo[2] == '@':
                 processed_memo = processed_memo[2:-2]
-            [sponsor, sponsee, not_parsed_words, account_error] = memo_parser.parse_memo(processed_memo, op["shares"], op["account"])
+            [sponsor, sponsee, not_parsed_words, account_error] = memo_parser.parse_memo(processed_memo, op["shares"],
+                                                                                         op["account"])
             sponsee_amount = 0
             for a in sponsee:
                 sponsee_amount += sponsee[a]
@@ -148,10 +155,10 @@ if __name__ == "__main__":
                 continue
             for m in member_data:
                 member_data[m].calc_share_age_until(op["timestamp"])
-                
+
             max_avg_share_age = 0
             sponsee_name = None
-            for m in member_data:  
+            for m in member_data:
                 if max_avg_share_age < member_data[m]["avg_share_age"]:
                     max_avg_share_age = member_data[m]["avg_share_age"]
                     sponsee_name = m
@@ -159,9 +166,9 @@ if __name__ == "__main__":
                 sponsee = {sponsee_name: shares}
                 sponsee_dict = json.dumps(sponsee)
                 print(sponsee_dict)
-                trxStorage.update_sponsee_index(op["index"], op["source"], sponsee_dict, "Valid")       
-               
-    if False: # deal with encrypted memos
+                trxStorage.update_sponsee_index(op["index"], op["source"], sponsee_dict, "Valid")
+
+    if False:  # deal with encrypted memos
         print("check for encrypted memos")
 
         set_shared_steem_instance(stm)
@@ -174,15 +181,15 @@ if __name__ == "__main__":
                 processed_memo = processed_memo[1:-1]
             if processed_memo[2] == '#':
                 processed_memo = processed_memo[2:-2]
-            print("processed_memo: %s, source: %s" %(processed_memo, op["source"]))
-            if len(processed_memo) > 1 and (processed_memo[0] == '#' or processed_memo[1] == '#') and  op["source"] == "steembasicincome":
-
+            print("processed_memo: %s, source: %s" % (processed_memo, op["source"]))
+            if len(processed_memo) > 1 and (processed_memo[0] == '#' or processed_memo[1] == '#') and op[
+                "source"] == "steembasicincome":
                 print("found: %s" % processed_memo)
                 memo = Memo(op["source"], op["account"], steem_instance=stm)
                 processed_memo = ascii(memo.decrypt(processed_memo)).replace('\n', '')
                 print("decrypt memo %s" % processed_memo)
                 trxStorage.update_memo(op["source"], op["account"], op["memo"], processed_memo)
-    if False: # deal with encrypted memos
+    if False:  # deal with encrypted memos
         print("check for encrypted memos")
 
         for op in transactionStorage.get_all():
@@ -194,8 +201,8 @@ if __name__ == "__main__":
             if processed_memo[2] == '#':
                 processed_memo = processed_memo[2:-2]
             # print("processed_memo: %s, to: %s" %(processed_memo, op["to"]))
-            if len(processed_memo) > 1 and (processed_memo[0] == '#' or processed_memo[1] == '#') and  op["to"] == "steembasicincome":
-
+            if len(processed_memo) > 1 and (processed_memo[0] == '#' or processed_memo[1] == '#') and op[
+                "to"] == "steembasicincome":
                 print("found: %s" % processed_memo)
                 memo = Memo(op["to"], op["sender"], steem_instance=stm)
                 dec_memo = memo.decrypt(processed_memo)
@@ -203,7 +210,7 @@ if __name__ == "__main__":
                 print("decrypt memo %s" % processed_memo)
                 transactionStorage.update_memo(op["sender"], op["to"], op["memo"], processed_memo, True)
 
-    if False:  #check when sponsor is different from account
+    if False:  # check when sponsor is different from account
         print('check sponsor accounts')
         memo_parser = MemoParser(steem_instance=stm)
         for op in data:
@@ -214,13 +221,14 @@ if __name__ == "__main__":
             if ":@" not in op["memo"]:
                 continue
             processed_memo = ascii(op["memo"]).replace('\n', '').replace('\\n', '').replace('\\', '')
-            print(processed_memo)                
+            print(processed_memo)
             if processed_memo[1] == '@':
                 processed_memo = processed_memo[1:-1]
-                
+
             if processed_memo[2] == '@':
                 processed_memo = processed_memo[2:-2]
-            [sponsor, sponsee, not_parsed_words, account_error] = memo_parser.parse_memo(processed_memo, op["shares"], op["account"])
+            [sponsor, sponsee, not_parsed_words, account_error] = memo_parser.parse_memo(processed_memo, op["shares"],
+                                                                                         op["account"])
             sponsee_amount = 0
             for a in sponsee:
                 sponsee_amount += sponsee[a]
@@ -234,9 +242,9 @@ if __name__ == "__main__":
 
                 trxStorage.update_sponsor_index(op["index"], op["source"], sponsor, "Valid")
             except:
-                print("error: %s" % processed_memo)  
+                print("error: %s" % processed_memo)
 
-    if False:  #check accountDoesNotExists
+    if False:  # check accountDoesNotExists
         print('check not existing accounts')
 
         memo_parser = MemoParser(steem_instance=stm)
@@ -244,13 +252,14 @@ if __name__ == "__main__":
             if op["status"] != "AccountDoesNotExist":
                 continue
             processed_memo = ascii(op["memo"]).replace('\n', '').replace('\\n', '').replace('\\', '')
-            print(processed_memo)                
+            print(processed_memo)
             if processed_memo[1] == '@':
                 processed_memo = processed_memo[1:-1]
-                
+
             if processed_memo[2] == '@':
                 processed_memo = processed_memo[2:-2]
-            [sponsor, sponsee, not_parsed_words, account_error] = memo_parser.parse_memo(processed_memo, op["shares"], op["account"])
+            [sponsor, sponsee, not_parsed_words, account_error] = memo_parser.parse_memo(processed_memo, op["shares"],
+                                                                                         op["account"])
             sponsee_amount = 0
             for a in sponsee:
                 sponsee_amount += sponsee[a]
@@ -265,8 +274,8 @@ if __name__ == "__main__":
                 print(sponsee_dict)
                 trxStorage.update_sponsee_index(op["index"], op["source"], sponsee_dict, "Valid")
             except:
-                print("error: %s" % processed_memo)   
-    if False: # fix memos with \n\n
+                print("error: %s" % processed_memo)
+    if False:  # fix memos with \n\n
         print("check for memos with \\n")
         for op in data:
             if op["status"] != "AccountDoesNotExist":
@@ -277,7 +286,7 @@ if __name__ == "__main__":
             if processed_memo[1] == '@':
                 processed_memo = processed_memo[1:-1]
             if processed_memo[2] == '@':
-                processed_memo = processed_memo[2:-2]                
+                processed_memo = processed_memo[2:-2]
             if processed_memo[0] != "@":
                 continue
             try:
@@ -288,23 +297,24 @@ if __name__ == "__main__":
             except:
                 print("error: %s" % processed_memo)
 
-    if False: # fix memos with \n\n
+    if False:  # fix memos with \n\n
         print('check not existing accounts')
         memo_parser = MemoParser(steem_instance=stm)
         for op in data:
             if op["status"] != "Valid":
                 continue
             if op["sponsee"].find("karthikdtrading1") == -1:
-                continue                
+                continue
 
             processed_memo = ascii(op["memo"]).replace('\n', '').replace('\\n', '').replace('\\', '')
-            print(processed_memo)                
+            print(processed_memo)
             if processed_memo[1] == '@':
                 processed_memo = processed_memo[1:-1]
-                
+
             if processed_memo[2] == '@':
                 processed_memo = processed_memo[2:-2]
-            [sponsor, sponsee, not_parsed_words, account_error] = memo_parser.parse_memo(processed_memo, op["shares"], op["account"])
+            [sponsor, sponsee, not_parsed_words, account_error] = memo_parser.parse_memo(processed_memo, op["shares"],
+                                                                                         op["account"])
             sponsee_amount = 0
             for a in sponsee:
                 sponsee_amount += sponsee[a]
@@ -319,9 +329,9 @@ if __name__ == "__main__":
                 print(sponsee_dict)
                 trxStorage.update_sponsee_index(op["index"], op["source"], sponsee_dict, "Valid")
             except:
-                print("error: %s" % processed_memo)           
+                print("error: %s" % processed_memo)
 
-    if False: #check all trx datasets
+    if False:  # check all trx datasets
         print("check trx dataset")
         for op in data:
             if op["status"] == "Valid":
@@ -337,10 +347,10 @@ if __name__ == "__main__":
                         timestamp = op["timestamp"]
                 except:
                     print("error at: %s" % str(op))
-    if False: #reset last cycle
+    if False:  # reset last cycle
         print("reset last cycle")
         confStorage.update({"last_cycle": last_cycle - timedelta(seconds=60 * share_cycle_min)})
-    if False: # reset management shares
+    if False:  # reset management shares
         print("Reset all mgmt trx data")
         trxStorage.delete_all("mgmt")
         shares_sum = 0
@@ -352,8 +362,9 @@ if __name__ == "__main__":
         start_index = 0
         for op in data:
             if op["status"] == "Valid":
-                share_type = op["share_type"]            
-                if share_type.lower() not in ["delegation", "removeddelegation", "delegationleased", "mgmt", "mgmttransfer", "sharetransfer"]:
+                share_type = op["share_type"]
+                if share_type.lower() not in ["delegation", "removeddelegation", "delegationleased", "mgmt",
+                                              "mgmttransfer", "sharetransfer"]:
                     shares = op["shares"]
                     sponsee = json.loads(op["sponsee"])
                     shares_sum += shares
@@ -369,8 +380,10 @@ if __name__ == "__main__":
                             mngt_shares = mgnt_shares[account]
                             total_mgnt_shares_sum += mngt_shares
                             sponsor = account
-                            mngtData = {"index": start_index, "source": "mgmt", "memo": "", "account": account, "sponsor": sponsor, "sponsee": {}, "shares": mngt_shares, "vests": float(0), "timestamp": formatTimeString(timestamp),
-                                     "status": "Valid", "share_type": "Mgmt"}
+                            mngtData = {"index": start_index, "source": "mgmt", "memo": "", "account": account,
+                                        "sponsor": sponsor, "sponsee": {}, "shares": mngt_shares, "vests": float(0),
+                                        "timestamp": formatTimeString(timestamp),
+                                        "status": "Valid", "share_type": "Mgmt"}
                             start_index += 1
                             trxStorage.add(mngtData)
         print("total_mgnt_shares_sum: %d - shares %d" % (total_mgnt_shares_sum, shares_sum))
@@ -387,7 +400,7 @@ if __name__ == "__main__":
         sum_sp = 0
         sum_sp_leased = 0
         sum_sp_shares = 0
-        
+
         print("load delegation")
         for d in trxStorage.get_share_type(share_type="Delegation"):
             if d["share_type"] == "Delegation":
@@ -397,7 +410,7 @@ if __name__ == "__main__":
             if d["share_type"] == "RemovedDelegation":
                 delegation[d["account"]] = 0
             delegation_shares[d["account"]] = 0
-        
+
         delegation_leased = {}
         delegation_shares = {}
         print("update delegation")
@@ -415,5 +428,5 @@ if __name__ == "__main__":
                 trxStorage.update_delegation_shares(account, acc, shares)
                 continue
             delegation_leased[acc] = delegation_account[acc]
-            trxStorage.update_delegation_state(account, acc, "Delegation", 
-                                              "DelegationLeased")
+            trxStorage.update_delegation_state(account, acc, "Delegation",
+                                               "DelegationLeased")

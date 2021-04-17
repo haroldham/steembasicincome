@@ -4,7 +4,6 @@ import os
 import dataset
 import json
 from steembi.storage import TrxDB, MemberDB
-    
 
 if __name__ == "__main__":
     config_file = 'config.json'
@@ -20,7 +19,6 @@ if __name__ == "__main__":
         other_accounts = config_data["other_accounts"]
         mgnt_shares = config_data["mgnt_shares"]
         hive_blockchain = config_data["hive_blockchain"]
-        
 
     db2 = dataset.connect(databaseConnector2)
     # Create keyStorage
@@ -32,7 +30,7 @@ if __name__ == "__main__":
     try:
         nodes.update_nodes()
     except:
-        print("could not update nodes")       
+        print("could not update nodes")
     stm = Steem(node=nodes.get_nodes(hive=hive_blockchain))
     data = trxStorage.get_all_data()
     status = {}

@@ -12,7 +12,6 @@ from steembi.transfer_ops_storage import AccountTrx
 import dataset
 from datetime import datetime
 from steembi.member import Member
-    
 
 if __name__ == "__main__":
     config_file = 'config.json'
@@ -26,39 +25,38 @@ if __name__ == "__main__":
         mgnt_shares = config_data["mgnt_shares"]
         hive_blockchain = config_data["hive_blockchain"]
 
-
     start_prep_time = time.time()
     db = dataset.connect(databaseConnector)
     db2 = dataset.connect(databaseConnector2)
-    
+
     accountStorage = AccountsDB(db2)
-    accounts = accountStorage.get()    
-    other_accounts = accountStorage.get_transfer()    
-    
+    accounts = accountStorage.get()
+    other_accounts = accountStorage.get_transfer()
+
     accountTrx = {}
     for account in accounts:
         if account == "steembasicincome":
             accountTrx["sbi"] = AccountTrx(db, "sbi")
         else:
             accountTrx[account] = AccountTrx(db, account)
-        
-    
+
     # Create keyStorage
     trxStorage = TrxDB(db2)
     memberStorage = MemberDB(db2)
     keyStorage = KeysDB(db2)
     transactionStorage = TransactionMemoDB(db2)
     transactionOutStorage = TransactionOutDB(db2)
-    
+
     confStorage = ConfigurationDB(db2)
     conf_setup = confStorage.get()
     last_cycle = conf_setup["last_cycle"]
     share_cycle_min = conf_setup["share_cycle_min"]
-    
-    print("sbi_transfer: last_cycle: %s - %.2f min" % (formatTimeString(last_cycle), (datetime.utcnow() - last_cycle).total_seconds() / 60))
-    
-    if last_cycle is not None and  (datetime.utcnow() - last_cycle).total_seconds() > 60 * share_cycle_min:    
-    
+
+    print("sbi_transfer: last_cycle: %s - %.2f min" % (
+    formatTimeString(last_cycle), (datetime.utcnow() - last_cycle).total_seconds() / 60))
+
+    if last_cycle is not None and (datetime.utcnow() - last_cycle).total_seconds() > 60 * share_cycle_min:
+
         key_list = []
         print("Parse new transfers.")
         key = keyStorage.get("steembasicincome", "memo")
@@ -68,16 +66,15 @@ if __name__ == "__main__":
         try:
             nodes.update_nodes()
         except:
-            print("could not update nodes")    
+            print("could not update nodes")
         stm = Steem(keys=key_list, node=nodes.get_nodes(hive=hive_blockchain))
         member_accounts = memberStorage.get_all_accounts()
         member_data = {}
         n_records = 0
-        share_age_member = {}    
+        share_age_member = {}
         for m in member_accounts:
             member_data[m] = Member(memberStorage.get(m))
-        
-        
+
         if True:
             print("delete from transaction_memo... ")
             transactionStorage.delete_sender("dtube.rewards")
@@ -91,9 +88,9 @@ if __name__ == "__main__":
             transactionStorage.delete_to("sbi9")
             transactionStorage.delete_to("sbi10")
             print("done.")
-    
+
         stop_index = None
-    
+
         for account_name in accounts:
             if account_name == "steembasicincome":
                 account_trx_name = "sbi"
@@ -102,10 +99,11 @@ if __name__ == "__main__":
             parse_vesting = (account_name == "steembasicincome")
             accountTrx[account_trx_name].db = dataset.connect(databaseConnector)
             account = Account(account_name, steem_instance=stm)
-            pah = ParseAccountHist(account, "", trxStorage, transactionStorage, transactionOutStorage, member_data, memberStorage=memberStorage, steem_instance=stm)
-            
+            pah = ParseAccountHist(account, "", trxStorage, transactionStorage, transactionOutStorage, member_data,
+                                   memberStorage=memberStorage, steem_instance=stm)
+
             op_index = trxStorage.get_all_op_index(account["name"])
-            
+
             if len(op_index) == 0:
                 start_index = 0
                 op_counter = 0
@@ -119,11 +117,10 @@ if __name__ == "__main__":
                 else:
                     start_index_offset = 0
 
-                
             ops = accountTrx[account_trx_name].get_all(op_types=["transfer", "delegate_vesting_shares"])
             if len(ops) == 0:
                 continue
-            
+
             if ops[-1]["op_acc_index"] < start_index - start_index_offset:
                 continue
             for op in ops:
@@ -138,8 +135,7 @@ if __name__ == "__main__":
                         continue
                     if json_op["memo"][:8] == 'https://':
                         continue
-                    
+
                 pah.parse_op(json_op, parse_vesting=parse_vesting)
-    
-    
+
         print("transfer script run %.2f s" % (time.time() - start_prep_time))

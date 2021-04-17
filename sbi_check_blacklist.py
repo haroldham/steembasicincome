@@ -10,7 +10,6 @@ from steembi.storage import TrxDB, MemberDB, ConfigurationDB, KeysDB, Transactio
 from steembi.transfer_ops_storage import TransferTrx
 from steembi.member import Member
 
-
 if __name__ == "__main__":
     config_file = 'config.json'
     if not os.path.isfile(config_file):
@@ -24,20 +23,19 @@ if __name__ == "__main__":
         other_accounts = config_data["other_accounts"]
         mgnt_shares = config_data["mgnt_shares"]
         hive_blockchain = config_data["hive_blockchain"]
-        
-        
+
     db2 = dataset.connect(databaseConnector2)
     db = dataset.connect(databaseConnector)
-    transferStorage = TransferTrx(db)    
+    transferStorage = TransferTrx(db)
     # Create keyStorage
     trxStorage = TrxDB(db2)
     keyStorage = KeysDB(db2)
     memberStorage = MemberDB(db2)
     confStorage = ConfigurationDB(db2)
     transactionStorage = TransactionMemoDB(db2)
-    
+
     conf_setup = confStorage.get()
-    
+
     last_cycle = conf_setup["last_cycle"]
     share_cycle_min = conf_setup["share_cycle_min"]
     sp_share_ratio = conf_setup["sp_share_ratio"]
@@ -45,15 +43,13 @@ if __name__ == "__main__":
     upvote_multiplier = conf_setup["upvote_multiplier"]
     last_paid_post = conf_setup["last_paid_post"]
     last_paid_comment = conf_setup["last_paid_comment"]
-    
 
-    
-    
-    print("last_cycle: %s - %.2f min" % (formatTimeString(last_cycle), (datetime.utcnow() - last_cycle).total_seconds() / 60))
+    print("last_cycle: %s - %.2f min" % (
+    formatTimeString(last_cycle), (datetime.utcnow() - last_cycle).total_seconds() / 60))
     if last_cycle is None:
-        last_cycle = datetime.utcnow() - timedelta(seconds = 60 * 145)
+        last_cycle = datetime.utcnow() - timedelta(seconds=60 * 145)
         confStorage.update({"last_cycle": last_cycle})
-    elif True: # doing same maintanence
+    elif True:  # doing same maintanence
         data = trxStorage.get_all_data()
         data = sorted(data, key=lambda x: (datetime.utcnow() - x["timestamp"]).total_seconds(), reverse=True)
         key_list = []
@@ -64,13 +60,13 @@ if __name__ == "__main__":
         try:
             nodes.update_nodes()
         except:
-            print("could not update nodes")        
-        stm = Steem(keys=key_list, node=nodes.get_nodes(hive=hive_blockchain))        
-        if True: # check if member are blacklisted
+            print("could not update nodes")
+        stm = Steem(keys=key_list, node=nodes.get_nodes(hive=hive_blockchain))
+        if True:  # check if member are blacklisted
             member_accounts = memberStorage.get_all_accounts()
             member_data = {}
             n_records = 0
-            share_age_member = {}    
+            share_age_member = {}
             for m in member_accounts:
                 member_data[m] = Member(memberStorage.get(m))
             cnt = 0
@@ -81,9 +77,8 @@ if __name__ == "__main__":
                     print("%d/%d" % (cnt, len(member_data)))
                     if len(member_data_list) > 0:
                         memberStorage.add_batch(member_data_list)
-                        member_data_list = []                    
-                    
-                    
+                        member_data_list = []
+
                 response = ""
                 cnt2 = 0
                 while str(response) != '<Response [200]>' and cnt2 < 10:
@@ -92,8 +87,7 @@ if __name__ == "__main__":
                     else:
                         response = requests.get("http://blacklist.usesteem.com/user/%s" % m)
                     cnt2 += 1
-                    
-                
+
                 if "blacklisted" in response.json():
                     if "steemcleaners" in response.json()["blacklisted"]:
                         member_data[m]["steemcleaners"] = True
@@ -103,8 +97,7 @@ if __name__ == "__main__":
                         member_data[m]["buildawhale"] = True
                     else:
                         member_data[m]["buildawhale"] = False
-                
-            
+
                 member_data_list.append(member_data[m])
             if len(member_data_list) > 0:
                 memberStorage.add_batch(member_data_list)

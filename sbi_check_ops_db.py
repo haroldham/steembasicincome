@@ -11,7 +11,6 @@ from steembi.transfer_ops_storage import TransferTrx, AccountTrx
 from steembi.storage import AccountsDB
 import dataset
 
-
 if __name__ == "__main__":
     config_file = 'config.json'
     if not os.path.isfile(config_file):
@@ -27,18 +26,17 @@ if __name__ == "__main__":
     db = dataset.connect(databaseConnector)
     db2 = dataset.connect(databaseConnector2)
     accountStorage = AccountsDB(db2)
-    accounts = accountStorage.get()    
-    
+    accounts = accountStorage.get()
+
     # Update current node list from @fullnodeupdate
     nodes = NodeList()
     nodes.update_nodes()
     stm = Steem(node=nodes.get_nodes(hive=hive_blockchain))
 
     print("Fetch new account history ops.")
-    
+
     blockchain = Blockchain(steem_instance=stm)
-    
-    
+
     accountTrx = {}
     for account in accounts:
         accountTrx[account] = AccountTrx(db, account)
@@ -49,7 +47,7 @@ if __name__ == "__main__":
         if account_name != "steembasicincome":
             continue
         account = Account(account_name, steem_instance=stm)
-        
+
         # Go trough all transfer ops
         cnt = 0
 
@@ -67,8 +65,10 @@ if __name__ == "__main__":
                 trx_in_block = op["trx_in_block"]
                 if virtual_op > 0:
                     trx_in_block = -1
-                d = {"block": op["block"], "op_acc_index": op["index"], "op_acc_name": account["name"], "trx_in_block": trx_in_block,
-                     "op_in_trx": op["op_in_trx"], "virtual_op": virtual_op,  "timestamp": formatTimeString(op["timestamp"]), "type": op["type"], "op_dict": json.dumps(op)}
+                d = {"block": op["block"], "op_acc_index": op["index"], "op_acc_name": account["name"],
+                     "trx_in_block": trx_in_block,
+                     "op_in_trx": op["op_in_trx"], "virtual_op": virtual_op,
+                     "timestamp": formatTimeString(op["timestamp"]), "type": op["type"], "op_dict": json.dumps(op)}
                 data.append(d)
                 if cnt % 1000 == 0:
                     print(op["timestamp"])
@@ -78,12 +78,12 @@ if __name__ == "__main__":
             if len(data) > 0:
                 print(op["timestamp"])
                 accountTrx[account_name].add_batch(data)
-                data = []            
+                data = []
     for account_name in accounts:
         if account_name != "steembasicincome":
             continue
         account = Account(account_name, steem_instance=stm)
-        
+
         # Go trough all transfer ops
         cnt = 0
 
@@ -100,8 +100,10 @@ if __name__ == "__main__":
                 trx_in_block = op["trx_in_block"]
                 if virtual_op > 0:
                     trx_in_block = -1
-                d = {"block": op["block"], "op_acc_index": op["index"], "op_acc_name": account["name"], "trx_in_block": trx_in_block,
-                     "op_in_trx": op["op_in_trx"], "virtual_op": virtual_op,  "timestamp": formatTimeString(op["timestamp"]), "type": op["type"], "op_dict": json.dumps(op)}
+                d = {"block": op["block"], "op_acc_index": op["index"], "op_acc_name": account["name"],
+                     "trx_in_block": trx_in_block,
+                     "op_in_trx": op["op_in_trx"], "virtual_op": virtual_op,
+                     "timestamp": formatTimeString(op["timestamp"]), "type": op["type"], "op_dict": json.dumps(op)}
                 data.append(d)
                 if cnt % 1000 == 0:
                     print(op["timestamp"])
@@ -111,22 +113,22 @@ if __name__ == "__main__":
             if len(data) > 0:
                 print(op["timestamp"])
                 accountTrx[account_name].add_batch(data)
-                data = []            
+                data = []
 
-    #start sbi2-sbi10
+                # start sbi2-sbi10
     for account_name in accounts:
         if account_name == "steembasicincome":
             continue
         else:
             continue
         account = Account(account_name, steem_instance=stm)
-        
+
         # Go trough all transfer ops
         cnt = 0
 
         start_block = accountTrx[account_name].get_latest_block()
         if start_block is not None:
-            
+
             start_block = start_block["block"]
             print("account %s - %d" % (account["name"], start_block))
         else:
@@ -144,13 +146,15 @@ if __name__ == "__main__":
                         if h["virtual_op"] <= virtual_op:
                             continue
                 else:
-                    continue                
+                    continue
                 virtual_op = op["virtual_op"]
                 trx_in_block = op["trx_in_block"]
                 if virtual_op > 0:
                     trx_in_block = -1
-                d = {"block": op["block"], "op_acc_index": op["index"], "op_acc_name": account["name"], "trx_in_block": trx_in_block,
-                     "op_in_trx": op["op_in_trx"], "virtual_op": virtual_op,  "timestamp": formatTimeString(op["timestamp"]), "type": op["type"], "op_dict": json.dumps(op)}
+                d = {"block": op["block"], "op_acc_index": op["index"], "op_acc_name": account["name"],
+                     "trx_in_block": trx_in_block,
+                     "op_in_trx": op["op_in_trx"], "virtual_op": virtual_op,
+                     "timestamp": formatTimeString(op["timestamp"]), "type": op["type"], "op_dict": json.dumps(op)}
                 data.append(d)
                 if cnt % 1000 == 0:
                     print(op["timestamp"])
@@ -160,13 +164,11 @@ if __name__ == "__main__":
             if len(data) > 0:
                 print(op["timestamp"])
                 accountTrx[account_name].add_batch(data)
-                data = []           
+                data = []
 
-
-    
-    # Create keyStorage
+                # Create keyStorage
     trxStorage = TransferTrx(db)
-    
+
     if not trxStorage.exists_table():
         trxStorage.create_table()
     for account in other_accounts:
@@ -175,7 +177,7 @@ if __name__ == "__main__":
 
         start_index = trxStorage.get_latest_index(account["name"])
         if start_index is not None:
-            start_index = start_index["op_acc_index"] + 1            
+            start_index = start_index["op_acc_index"] + 1
             print("account %s - %d" % (account["name"], start_index))
         data = []
         for op in account.history(start=start_index, use_block_num=False, only_ops=["transfer"]):
@@ -185,9 +187,11 @@ if __name__ == "__main__":
             if virtual_op > 0:
                 trx_in_block = -1
             memo = ascii(op["memo"])
-            d = {"block": op["block"], "op_acc_index": op["index"], "op_acc_name": account["name"], "trx_in_block": trx_in_block,
-                 "op_in_trx": op["op_in_trx"], "virtual_op": virtual_op, "timestamp": formatTimeString(op["timestamp"]), "from": op["from"], "to": op["to"],
-                    "amount": amount.amount, "amount_symbol": amount.symbol, "memo": memo, "op_type": op["type"]}
+            d = {"block": op["block"], "op_acc_index": op["index"], "op_acc_name": account["name"],
+                 "trx_in_block": trx_in_block,
+                 "op_in_trx": op["op_in_trx"], "virtual_op": virtual_op, "timestamp": formatTimeString(op["timestamp"]),
+                 "from": op["from"], "to": op["to"],
+                 "amount": amount.amount, "amount_symbol": amount.symbol, "memo": memo, "op_type": op["type"]}
             data.append(d)
             if cnt % 1000 == 0:
                 print(op["timestamp"])

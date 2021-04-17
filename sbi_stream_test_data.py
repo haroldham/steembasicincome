@@ -8,10 +8,6 @@ import json
 from steembi.transfer_ops_storage import AccountTrx
 import dataset
 
-
-
-
-
 if __name__ == "__main__":
     config_file = 'config.json'
     if not os.path.isfile(config_file):
@@ -35,27 +31,24 @@ if __name__ == "__main__":
 
     phase = 0
 
-    
-    db = dataset.connect(databaseConnector)    
-    
-    
+    db = dataset.connect(databaseConnector)
+
     # Update current node list from @fullnodeupdate
     nodes = NodeList()
     try:
         nodes.update_nodes(weights={"hist": 1})
     except:
-        print("could not update nodes")           
+        print("could not update nodes")
     stm = Steem(node=nodes.get_nodes())
     print(str(stm))
     set_shared_steem_instance(stm)
-    
+
     blockchain = Blockchain()
 
-    
     accountTrx = {}
     for account in accounts:
         accountTrx[account] = AccountTrx(db, account)
-        
+
         if not accountTrx[account].exists_table():
             accountTrx[account].create_table()
 
@@ -68,13 +61,12 @@ if __name__ == "__main__":
         ops = accountTrx[account_name].get_all()
         last_op_index = -1
         for op in ops:
-            
+
             if op["op_acc_index"] - last_op_index != 1:
                 print("%s - has missing ops %d - %d != 1" % (account_name, op["op_acc_index"], last_op_index))
             else:
                 last_op_index = op["op_acc_index"]
-                continue              
-
+                continue
 
     for account in other_accounts:
         account = Account(account)
@@ -83,11 +75,11 @@ if __name__ == "__main__":
         ops = accountTrx[account_name].get_all()
         last_op_index = -1
         for op in ops:
-            
+
             if op["op_acc_index"] - last_op_index != 1:
                 print("%s - has missing ops %d - %d != 1" % (account_name, op["op_acc_index"], last_op_index))
             else:
                 last_op_index = op["op_acc_index"]
-                continue            
-    
+                continue
+
     stop_index = None

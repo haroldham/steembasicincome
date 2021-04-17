@@ -15,8 +15,6 @@ from steembi.storage import TrxDB, MemberDB, ConfigurationDB
 from steembi.transfer_ops_storage import TransferTrx, AccountTrx, MemberHistDB
 from steembi.member import Member
 
-    
-
 if __name__ == "__main__":
     config_file = 'config.json'
     if not os.path.isfile(config_file):
@@ -39,23 +37,22 @@ if __name__ == "__main__":
         other_accounts = config_data["other_accounts"]
         mgnt_shares = config_data["mgnt_shares"]
         hive_blockchain = config_data["hive_blockchain"]
-        
-        
+
     db2 = dataset.connect(databaseConnector2)
     db = dataset.connect(databaseConnector)
-    transferStorage = TransferTrx(db)    
+    transferStorage = TransferTrx(db)
     # Create keyStorage
     trxStorage = TrxDB(db2)
     memberStorage = MemberDB(db2)
     accountStorage = MemberHistDB(db)
     confStorage = ConfigurationDB(db2)
-    
+
     accountTrx = {}
     for account in accounts:
-        accountTrx[account] = AccountTrx(db, account)    
-    
+        accountTrx[account] = AccountTrx(db, account)
+
     conf_setup = confStorage.get()
-    
+
     last_cycle = conf_setup["last_cycle"]
     share_cycle_min = conf_setup["share_cycle_min"]
     sp_share_ratio = conf_setup["sp_share_ratio"]
@@ -63,37 +60,34 @@ if __name__ == "__main__":
     upvote_multiplier = conf_setup["upvote_multiplier"]
     last_paid_post = conf_setup["last_paid_post"]
     last_paid_comment = conf_setup["last_paid_comment"]
-    
 
     minimum_vote_threshold = conf_setup["minimum_vote_threshold"]
     comment_vote_divider = conf_setup["comment_vote_divider"]
-    comment_vote_timeout_h = conf_setup["comment_vote_timeout_h"]    
-    
-    print("last_cycle: %s - %.2f min" % (formatTimeString(last_cycle), (datetime.utcnow() - last_cycle).total_seconds() / 60))
+    comment_vote_timeout_h = conf_setup["comment_vote_timeout_h"]
+
+    print("last_cycle: %s - %.2f min" % (
+    formatTimeString(last_cycle), (datetime.utcnow() - last_cycle).total_seconds() / 60))
     if True:
-        last_cycle = datetime.utcnow() - timedelta(seconds = 60 * 145)
-        confStorage.update({"last_cycle": last_cycle})        
+        last_cycle = datetime.utcnow() - timedelta(seconds=60 * 145)
+        confStorage.update({"last_cycle": last_cycle})
         print("update member database")
         member_accounts = memberStorage.get_all_accounts()
         data = trxStorage.get_all_data()
-        
-        
-        
+
         # Update current node list from @fullnodeupdate
         nodes = NodeList()
         nodes.update_nodes()
-        stm = Steem(node=nodes.get_nodes(hive=hive_blockchain))    
+        stm = Steem(node=nodes.get_nodes(hive=hive_blockchain))
         member_data = {}
         n_records = 0
-        share_age_member = {}    
+        share_age_member = {}
         for m in member_accounts:
             member_data[m] = Member(memberStorage.get(m))
-        
-                    
+
         if True:
             b = Blockchain(steem_instance=stm)
             wallet = Wallet(steem_instance=stm)
-            
+
             for acc_name in accounts:
                 print(acc_name)
                 comments_transfer = []
@@ -130,7 +124,7 @@ if __name__ == "__main__":
                                 block_num = b.get_estimated_block_num(vote["time"])
                                 current_block_num = b.get_current_block_num()
                                 transaction = None
-                                block_search_list = [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5]                       
+                                block_search_list = [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5]
                                 block_cnt = 0
                                 while transaction is None and block_cnt < len(block_search_list):
                                     if block_num + block_search_list[block_cnt] > current_block_num:
@@ -152,8 +146,8 @@ if __name__ == "__main__":
                                     signed_tx = Signed_Transaction(transaction)
                                     public_keys = []
                                     for key in signed_tx.verify(chain=stm.chain_params, recover_parameter=True):
-                                        public_keys.append(format(Base58(key, prefix=stm.prefix), stm.prefix))                            
-                                    
+                                        public_keys.append(format(Base58(key, prefix=stm.prefix), stm.prefix))
+
                                     empty_public_keys = []
                                     for key in public_keys:
                                         pubkey_account = wallet.getAccountFromPublicKey(key)
@@ -161,15 +155,15 @@ if __name__ == "__main__":
                                             empty_public_keys.append(key)
                                         else:
                                             key_accounts.append(pubkey_account)
-        
+
                                 for a in key_accounts:
                                     if vote["voter"] == a:
                                         continue
                                     if a not in ["quarry", "steemdunk"]:
                                         print(a)
                                     if a in ["smartsteem", "smartmarket", "minnowbooster"]:
-                                        vote_did_sign = False               
-                                
+                                        vote_did_sign = False
+
                                 if not vote_did_sign:
                                     continue
                             except:
@@ -193,10 +187,8 @@ if __name__ == "__main__":
                                     continue
                                 member_data[vote["voter"]]["earned_rshares"] += rshares
                                 member_data[vote["voter"]]["curation_rshares"] += rshares
-                                member_data[vote["voter"]]["balance_rshares"] += rshares                            
+                                member_data[vote["voter"]]["balance_rshares"] += rshares
 
-                
-                    
         if False:
             print("write member database")
             memberStorage.db = dataset.connect(databaseConnector2)

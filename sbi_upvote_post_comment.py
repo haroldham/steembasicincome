@@ -59,21 +59,21 @@ if __name__ == "__main__":
     print("Upvote posts/comments")
     start_timestamp = datetime(2018, 12, 14, 9, 18, 20)
 
-    if True:
+    if True:  # FIXME This code always runs. Should this be a real check?
         max_batch_size = 50
         threading = False
         wss = False
         https = True
         normal = False
         appbase = True
-    elif False:
+    elif False:  # FIXME This code never runs. Should this be a real check?
         max_batch_size = None
         threading = True
         wss = True
         https = False
         normal = True
         appbase = True
-    else:
+    else:  # FIXME This code never runs. Should this be a real check?
         max_batch_size = None
         threading = False
         wss = True

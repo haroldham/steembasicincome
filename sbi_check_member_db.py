@@ -47,7 +47,7 @@ if __name__ == "__main__":
     for m in member_accounts:
         member_data[m] = memberStorage.get(m)
     # Check wrong account names:
-    if False:
+    if False:  # FIXME This code never runs. Should this be a real check?
         cnt = 0
         for m in member_accounts:
             if aborted:

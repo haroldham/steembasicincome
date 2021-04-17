@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     print("last_cycle: %s - %.2f min" % (
     formatTimeString(last_cycle), (datetime.utcnow() - last_cycle).total_seconds() / 60))
-    if True:
+    if True:  # FIXME This code always runs. Should this be a real check?
         last_cycle = datetime.utcnow() - timedelta(seconds=60 * 145)
         confStorage.update({"last_cycle": last_cycle})
         print("update member database")
@@ -74,7 +74,7 @@ if __name__ == "__main__":
             member_data[m] = Member(memberStorage.get(m))
 
         print("reset rshares")
-        if True:
+        if True:  # FIXME This code always runs. Should this be a real check?
             for m in member_data:
                 total_share_days = member_data[m]["total_share_days"]
                 member_data[m]["first_cycle_at"] = datetime(1970, 1, 1, 0, 0, 0)
@@ -96,7 +96,7 @@ if __name__ == "__main__":
                         member_data[author]["rewarded_rshares"] += int(vote["rshares"])
                         member_data[author]["balance_rshares"] -= int(vote["rshares"])
 
-        if True:
+        if True:  # FIXME This code always runs. Should this be a real check?
             b = Blockchain(steem_instance=stm)
             wallet = Wallet(steem_instance=stm)
             accountTrx = {}

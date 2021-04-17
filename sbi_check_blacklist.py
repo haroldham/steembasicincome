@@ -49,7 +49,7 @@ if __name__ == "__main__":
     if last_cycle is None:
         last_cycle = datetime.utcnow() - timedelta(seconds=60 * 145)
         confStorage.update({"last_cycle": last_cycle})
-    elif True:  # doing same maintanence
+    elif True:  # doing same maintanence  # FIXME This code always runs. Should this be a real check?
         data = trxStorage.get_all_data()
         data = sorted(data, key=lambda x: (datetime.utcnow() - x["timestamp"]).total_seconds(), reverse=True)
         key_list = []
@@ -62,7 +62,7 @@ if __name__ == "__main__":
         except:
             print("could not update nodes")
         stm = Steem(keys=key_list, node=nodes.get_nodes(hive=hive_blockchain))
-        if True:  # check if member are blacklisted
+        if True:  # check if member are blacklisted  # FIXME This code always runs. Should this be a real check?
             member_accounts = memberStorage.get_all_accounts()
             member_data = {}
             n_records = 0

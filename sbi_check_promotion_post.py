@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
     print("last_cycle: %s - %.2f min" % (
     formatTimeString(last_cycle), (datetime.utcnow() - last_cycle).total_seconds() / 60))
-    if True:
+    if True:  # FIXME This code always runs. Should this be a real check?
         last_cycle = datetime.utcnow() - timedelta(seconds=60 * 145)
         confStorage.update({"last_cycle": last_cycle})
         print("update member database")
@@ -84,7 +84,7 @@ if __name__ == "__main__":
         for m in member_accounts:
             member_data[m] = Member(memberStorage.get(m))
 
-        if True:
+        if True:  # FIXME This code always runs. Should this be a real check?
             b = Blockchain(steem_instance=stm)
             wallet = Wallet(steem_instance=stm)
 
@@ -170,7 +170,7 @@ if __name__ == "__main__":
                                 continue
                         if vote_did_sign:
                             continue
-                        if False:
+                        if False:  # FIXME This code never runs. Should this be a real check?
                             if c.is_main_post():
                                 if acc_name == "steembasicincome":
                                     rshares = vote["rshares"] * upvote_multiplier
@@ -189,7 +189,7 @@ if __name__ == "__main__":
                                 member_data[vote["voter"]]["curation_rshares"] += rshares
                                 member_data[vote["voter"]]["balance_rshares"] += rshares
 
-        if False:
+        if False:  # FIXME This code never runs. Should this be a real check?
             print("write member database")
             memberStorage.db = dataset.connect(databaseConnector2)
             member_data_list = []

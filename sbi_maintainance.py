@@ -106,7 +106,7 @@ if __name__ == "__main__":
         print("could not update nodes")
     stm = Steem(keys=key_list, node=nodes.get_nodes(hive=hive_blockchain))
 
-    if False:  # check if member are blacklisted
+    if False:  # check if member are blacklisted  # FIXME This code never runs. Should this be a real check?
         member_accounts = memberStorage.get_all_accounts()
         member_data = {}
         n_records = 0
@@ -132,7 +132,7 @@ if __name__ == "__main__":
             member_data_list.append(member_data[m])
         memberStorage.add_batch(member_data_list)
         member_data_list = []
-    if False:  # LessOrNoSponsee
+    if False:  # LessOrNoSponsee  # FIXME This code never runs. Should this be a real check?
         memo_parser = MemoParser(steem_instance=stm)
         for op in data:
             if op["status"] != "LessOrNoSponsee":
@@ -168,7 +168,7 @@ if __name__ == "__main__":
                 print(sponsee_dict)
                 trxStorage.update_sponsee_index(op["index"], op["source"], sponsee_dict, "Valid")
 
-    if False:  # deal with encrypted memos
+    if False:  # deal with encrypted memos  # FIXME This code never runs. Should this be a real check?
         print("check for encrypted memos")
 
         set_shared_steem_instance(stm)
@@ -189,7 +189,7 @@ if __name__ == "__main__":
                 processed_memo = ascii(memo.decrypt(processed_memo)).replace('\n', '')
                 print("decrypt memo %s" % processed_memo)
                 trxStorage.update_memo(op["source"], op["account"], op["memo"], processed_memo)
-    if False:  # deal with encrypted memos
+    if False:  # deal with encrypted memos  # FIXME This code never runs. Should this be a real check?
         print("check for encrypted memos")
 
         for op in transactionStorage.get_all():
@@ -210,7 +210,7 @@ if __name__ == "__main__":
                 print("decrypt memo %s" % processed_memo)
                 transactionStorage.update_memo(op["sender"], op["to"], op["memo"], processed_memo, True)
 
-    if False:  # check when sponsor is different from account
+    if False:  # check when sponsor is different from account  # FIXME This code never runs. Should this be a real check?
         print('check sponsor accounts')
         memo_parser = MemoParser(steem_instance=stm)
         for op in data:
@@ -244,7 +244,7 @@ if __name__ == "__main__":
             except:
                 print("error: %s" % processed_memo)
 
-    if False:  # check accountDoesNotExists
+    if False:  # check accountDoesNotExists  # FIXME This code never runs. Should this be a real check?
         print('check not existing accounts')
 
         memo_parser = MemoParser(steem_instance=stm)
@@ -275,7 +275,7 @@ if __name__ == "__main__":
                 trxStorage.update_sponsee_index(op["index"], op["source"], sponsee_dict, "Valid")
             except:
                 print("error: %s" % processed_memo)
-    if False:  # fix memos with \n\n
+    if False:  # fix memos with \n\n  # FIXME This code never runs. Should this be a real check?
         print("check for memos with \\n")
         for op in data:
             if op["status"] != "AccountDoesNotExist":
@@ -297,7 +297,7 @@ if __name__ == "__main__":
             except:
                 print("error: %s" % processed_memo)
 
-    if False:  # fix memos with \n\n
+    if False:  # fix memos with \n\n  # FIXME This code never runs. Should this be a real check?
         print('check not existing accounts')
         memo_parser = MemoParser(steem_instance=stm)
         for op in data:
@@ -331,7 +331,7 @@ if __name__ == "__main__":
             except:
                 print("error: %s" % processed_memo)
 
-    if False:  # check all trx datasets
+    if False:  # check all trx datasets  # FIXME This code never runs. Should this be a real check?
         print("check trx dataset")
         for op in data:
             if op["status"] == "Valid":
@@ -347,10 +347,10 @@ if __name__ == "__main__":
                         timestamp = op["timestamp"]
                 except:
                     print("error at: %s" % str(op))
-    if False:  # reset last cycle
+    if False:  # reset last cycle  # FIXME This code never runs. Should this be a real check?
         print("reset last cycle")
         confStorage.update({"last_cycle": last_cycle - timedelta(seconds=60 * share_cycle_min)})
-    if False:  # reset management shares
+    if False:  # reset management shares  # FIXME This code never runs. Should this be a real check?
         print("Reset all mgmt trx data")
         trxStorage.delete_all("mgmt")
         shares_sum = 0
@@ -388,7 +388,7 @@ if __name__ == "__main__":
                             trxStorage.add(mngtData)
         print("total_mgnt_shares_sum: %d - shares %d" % (total_mgnt_shares_sum, shares_sum))
     # check delegation
-    if False:
+    if False:  # FIXME This code never runs. Should this be a real check?
         delegation = {}
         sum_sp = {}
         sum_sp_shares = {}

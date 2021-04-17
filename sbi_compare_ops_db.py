@@ -38,7 +38,7 @@ if __name__ == "__main__":
     for account in accounts:
         accountTrx[account] = AccountTrx(db, account)
         if not accountTrx[account].exists_table():
-            accountTrx[account].create_table()
+            accountTrx[account].create_table()  # FIXME Method does not exist
     # temp
     accountTrx["sbi"] = AccountTrx(db, "sbi")
 

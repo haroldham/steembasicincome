@@ -30,12 +30,12 @@ if __name__ == "__main__":
     newTrxStorage = False
     if not trxStorage.exists_table():
         newTrxStorage = True
-        trxStorage.create_table()
+        trxStorage.create_table()  # FIXME Method does not exist
 
     newMemberStorage = False
     if not memberStorage.exists_table():
         newMemberStorage = True
-        memberStorage.create_table()
+        memberStorage.create_table()  # FIXME Method does not exist
 
     # Update current node list from @fullnodeupdate
     print("build member database")

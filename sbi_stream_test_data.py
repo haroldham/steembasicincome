@@ -50,7 +50,7 @@ if __name__ == "__main__":
         accountTrx[account] = AccountTrx(db, account)
 
         if not accountTrx[account].exists_table():
-            accountTrx[account].create_table()
+            accountTrx[account].create_table()  # FIXME Method does not exist
 
     for account_name in accounts:
         account = Account(account_name)

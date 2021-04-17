@@ -79,12 +79,10 @@ if __name__ == "__main__":
     stm = Steem(node=node_list, num_retries=3, timeout=10)
     set_shared_steem_instance(stm)
 
-    accountTrx = {}
     accountTrx = MemberHistDB(db)
 
     b = Blockchain(steem_instance=stm)
     current_block = b.get_current_block()
-    stop_time = latest_enrollment
     stop_time = current_block["timestamp"]
     start_time = stop_time - timedelta(seconds=30 * 24 * 60 * 60)
 

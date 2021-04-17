@@ -57,7 +57,6 @@ if __name__ == "__main__":
         print("account %s" % account["name"])
         # Go trough all transfer ops
         cnt = 0
-        cnt = 0
         ops = accountTrx[account_name].get_all()
         last_op_index = -1
         for op in ops:

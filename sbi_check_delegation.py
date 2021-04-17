@@ -56,10 +56,6 @@ if __name__ == "__main__":
 
         # Update current node list from @fullnodeupdate
 
-        delegation = {}
-        sum_sp = {}
-        sum_sp_shares = {}
-        sum_sp_leased = {}
         account = "steembasicincome"
         delegation = {}
         delegation_shares = {}

@@ -21,7 +21,6 @@ if __name__ == "__main__":
     else:
         with open(config_file) as json_data_file:
             config_data = json.load(json_data_file)
-        # print(config_data)
         databaseConnector = config_data["databaseConnector"]
         databaseConnector2 = config_data["databaseConnector2"]
         mgnt_shares = config_data["mgnt_shares"]
@@ -65,16 +64,12 @@ if __name__ == "__main__":
         key = keyStorage.get("steembasicincome", "memo")
         if key is not None:
             key_list.append(key["wif"])
-        #print(key_list)
         nodes = NodeList()
         try:
             nodes.update_nodes()
         except:
             print("could not update nodes")    
         stm = Steem(keys=key_list, node=nodes.get_nodes(hive=hive_blockchain))
-        # set_shared_steem_instance(stm)    
-        
-        # print("load member database")
         member_accounts = memberStorage.get_all_accounts()
         member_data = {}
         n_records = 0
@@ -98,8 +93,6 @@ if __name__ == "__main__":
             print("done.")
     
         stop_index = None
-        # stop_index = addTzInfo(datetime(2018, 7, 21, 23, 46, 00))
-        # stop_index = formatTimeString("2018-07-21T23:46:09")    
     
         for account_name in accounts:
             if account_name == "steembasicincome":
@@ -109,7 +102,6 @@ if __name__ == "__main__":
             parse_vesting = (account_name == "steembasicincome")
             accountTrx[account_trx_name].db = dataset.connect(databaseConnector)
             account = Account(account_name, steem_instance=stm)
-            # print(account["name"])
             pah = ParseAccountHist(account, "", trxStorage, transactionStorage, transactionOutStorage, member_data, memberStorage=memberStorage, steem_instance=stm)
             
             op_index = trxStorage.get_all_op_index(account["name"])
@@ -126,10 +118,7 @@ if __name__ == "__main__":
                     start_index_offset = 316
                 else:
                     start_index_offset = 0
-    
-            # print("start_index %d" % start_index)
-            # ops = []
-            # 
+
                 
             ops = accountTrx[account_trx_name].get_all(op_types=["transfer", "delegate_vesting_shares"])
             if len(ops) == 0:

@@ -40,7 +40,6 @@ if __name__ == "__main__":
 
     # Update current node list from @fullnodeupdate
     print("build member database")
-    # memberStorage.wipe(True)
     accs = memberStorage.get_all_accounts()
     for a in accs:
         memberStorage.delete(a)

@@ -18,7 +18,6 @@ if __name__ == "__main__":
     else:
         with open(config_file) as json_data_file:
             config_data = json.load(json_data_file)
-        # print(config_data)
         accounts = config_data["accounts"]
         databaseConnector = config_data["databaseConnector"]
         databaseConnector2 = config_data["databaseConnector2"]
@@ -34,7 +33,6 @@ if __name__ == "__main__":
     trxStorage = TrxDB(db2)
     keyStorage = KeysDB(db2)
     memberStorage = MemberDB(db2)
-    # accountStorage = MemberHistDB(db)
     confStorage = ConfigurationDB(db2)
     transactionStorage = TransactionMemoDB(db2)
     
@@ -58,12 +56,10 @@ if __name__ == "__main__":
     elif True: # doing same maintanence
         data = trxStorage.get_all_data()
         data = sorted(data, key=lambda x: (datetime.utcnow() - x["timestamp"]).total_seconds(), reverse=True)
-        # data = sorted(data, key=lambda x: (datetime.utcnow() - x["timestamp"]).total_seconds(), reverse=True)
         key_list = []
         key = keyStorage.get("steembasicincome", "memo")
         if key is not None:
             key_list.append(key["wif"])
-        #print(key_list)
         nodes = NodeList()
         try:
             nodes.update_nodes()

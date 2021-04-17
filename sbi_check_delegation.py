@@ -17,7 +17,6 @@ if __name__ == "__main__":
     else:
         with open(config_file) as json_data_file:
             config_data = json.load(json_data_file)
-        # print(config_data)
         databaseConnector = config_data["databaseConnector"]
         databaseConnector2 = config_data["databaseConnector2"]
         mgnt_shares = config_data["mgnt_shares"]

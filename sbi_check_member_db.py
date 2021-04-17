@@ -40,7 +40,6 @@ if __name__ == "__main__":
 
     # Update current node list from @fullnodeupdate
     print("check member database")
-    # memberStorage.wipe(True)
     member_accounts = memberStorage.get_all_accounts()
     data = trxStorage.get_all_data()
     

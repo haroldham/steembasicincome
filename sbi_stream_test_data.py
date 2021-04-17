@@ -32,9 +32,7 @@ if __name__ == "__main__":
         databaseConnector = config_data["databaseConnector"]
         databaseConnector2 = config_data["databaseConnector2"]
         other_accounts = config_data["other_accounts"]
-    
-    # sqlDataBaseFile = os.path.join(path, database)
-    # databaseConnector = "sqlite:///" + sqlDataBaseFile
+
     phase = 0
 
     
@@ -93,5 +91,3 @@ if __name__ == "__main__":
                 continue            
     
     stop_index = None
-    # stop_index = addTzInfo(datetime(2018, 7, 21, 23, 46, 00))
-    # stop_index = formatTimeString("2018-07-21T23:46:09")

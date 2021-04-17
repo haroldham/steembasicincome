@@ -20,13 +20,10 @@ if __name__ == "__main__":
     else:
         with open(config_file) as json_data_file:
             config_data = json.load(json_data_file)
-        # print(config_data)
         databaseConnector = config_data["databaseConnector"]
         databaseConnector2 = config_data["databaseConnector2"]
         hive_blockchain = config_data["hive_blockchain"]
     start_prep_time = time.time()
-    # sqlDataBaseFile = os.path.join(path, database)
-    # databaseConnector = "sqlite:///" + sqlDataBaseFile
     db = dataset.connect(databaseConnector)
     db2 = dataset.connect(databaseConnector2)
     accountStorage = AccountsDB(db2)
@@ -45,7 +42,6 @@ if __name__ == "__main__":
         # Update current node list from @fullnodeupdate
         nodes = NodeList()
         nodes.update_nodes()
-        # nodes.update_nodes(weights={"hist": 1})
         stm = Steem(node=nodes.get_nodes(hive=hive_blockchain))
         print(str(stm))
         
@@ -60,9 +56,6 @@ if __name__ == "__main__":
                 accountTrx["sbi"] = AccountTrx(db, "sbi")
             else:
                 accountTrx[account] = AccountTrx(db, account)
-    
-        # stop_index = addTzInfo(datetime(2018, 7, 21, 23, 46, 00))
-        # stop_index = formatTimeString("2018-07-21T23:46:09")
         
         for account_name in accounts:
             if account_name == "steembasicincome":
@@ -92,7 +85,6 @@ if __name__ == "__main__":
             start_index = accountTrx[account_name].get_latest_index()
             if start_index is not None:
                 start_index = start_index["op_acc_index"] + 1
-                # print("account %s - %d" % (account["name"], start_index))
             else:
                 start_index = 0
     
@@ -101,7 +93,6 @@ if __name__ == "__main__":
             last_trx = trx_in_block
             for op in account.history(start=start_block - 5, use_block_num=True):
                 if op["block"] < start_block:
-                    # last_block = op["block"]
                     continue
                 elif op["block"] == start_block:
                     if op["virtual_op"] == 0:
@@ -128,7 +119,6 @@ if __name__ == "__main__":
     
                 d = {"block": op["block"], "op_acc_index": start_index, "op_acc_name": account["name"], "trx_in_block": trx_in_block,
                      "op_in_trx": op_in_trx, "virtual_op": virtual_op,  "timestamp": formatTimeString(op["timestamp"]), "type": op["type"], "op_dict": json.dumps(op)}
-                #op_in_trx += 1
                 start_index += 1
                 last_block = op["block"]
                 last_trx = trx_in_block

@@ -21,13 +21,10 @@ if __name__ == "__main__":
     else:
         with open(config_file) as json_data_file:
             config_data = json.load(json_data_file)
-        # print(config_data)
         databaseConnector = config_data["databaseConnector"]
         databaseConnector2 = config_data["databaseConnector2"]
         hive_blockchain = config_data["hive_blockchain"]
-    
-    # sqlDataBaseFile = os.path.join(path, database)
-    # databaseConnector = "sqlite:///" + sqlDataBaseFile
+
     start_prep_time = time.time()
     db2 = dataset.connect(databaseConnector2)
     
@@ -53,7 +50,6 @@ if __name__ == "__main__":
     last_paid_comment = conf_setup["last_paid_comment"]
     upvote_multiplier_adjusted = conf_setup["upvote_multiplier_adjusted"]
     
-    # print("Count rshares of upvoted members.")
     member_accounts = memberStorage.get_all_accounts()
     print("%d members in list" % len(member_accounts))
     
@@ -77,7 +73,6 @@ if __name__ == "__main__":
     curationOptimTrx.delete_old_posts(days=7)
     # Update current node list from @fullnodeupdate
     nodes = NodeList()
-    # nodes.update_nodes(weights={"hist": 1})
     try:
         nodes.update_nodes()
     except:
@@ -85,7 +80,6 @@ if __name__ == "__main__":
         
     node_list = nodes.get_nodes(hive=hive_blockchain)
     stm = Steem(node=node_list, num_retries=3, timeout=10)
-    # print(str(stm))
     set_shared_steem_instance(stm)
     
     accountTrx = {}
@@ -104,11 +98,9 @@ if __name__ == "__main__":
     
     if start_block is None:
         start_block = b.get_estimated_block_num(addTzInfo(start_time))
-        # block_id_list = []
         trx_id_list = []
     else:
         trx_id_list = accountTrx.get_block_trx_id(start_block)
-    # end_block = current_block["id"] 
     end_block = current_block["id"] - (20 * 10)
     if end_block > start_block + 6000:
         end_block = start_block + 6000
@@ -123,7 +115,6 @@ if __name__ == "__main__":
     accountTrx.delete_old_data(end_block - (20 * 60 * 24 * 7))
     print("delete done")
     
-    # print("start to stream")
     db_data = []
     curation_vote_list = []
 
@@ -133,7 +124,6 @@ if __name__ == "__main__":
     cnt = 0
     comment_cnt = 0
     vote_cnt = 0
-    # print("Check rshares from %d - %d" % (int(start_block), int(end_block)))
     for op in b.stream(start=int(start_block), stop=int(end_block), opNames=["vote", "comment"], threading=False, thread_num=8):
         block_num = op["block_num"]
         if last_block_num is None:

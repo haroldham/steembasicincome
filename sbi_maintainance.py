@@ -43,7 +43,6 @@ if __name__ == "__main__":
     else:
         with open(config_file) as json_data_file:
             config_data = json.load(json_data_file)
-        # print(config_data)
         accounts = config_data["accounts"]
         databaseConnector = config_data["databaseConnector"]
         databaseConnector2 = config_data["databaseConnector2"]
@@ -88,7 +87,6 @@ if __name__ == "__main__":
 
     data = trxStorage.get_all_data()
     data = sorted(data, key=lambda x: (datetime.utcnow() - x["timestamp"]).total_seconds(), reverse=True)
-    # data = sorted(data, key=lambda x: (datetime.utcnow() - x["timestamp"]).total_seconds(), reverse=True)
     key_list = []
     key = keyStorage.get("steembasicincome", "memo")
     if key is not None:

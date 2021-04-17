@@ -16,14 +16,11 @@ if __name__ == "__main__":
     else:
         with open(config_file) as json_data_file:
             config_data = json.load(json_data_file)
-        # print(config_data)
         databaseConnector = config_data["databaseConnector"]
         databaseConnector2 = config_data["databaseConnector2"]
         other_accounts = config_data["other_accounts"]
         hive_blockchain = config_data["hive_blockchain"]
     start_prep_time = time.time()
-    # sqlDataBaseFile = os.path.join(path, database)
-    # databaseConnector = "sqlite:///" + sqlDataBaseFile
     db = dataset.connect(databaseConnector)
     db2 = dataset.connect(databaseConnector2)
     accountStorage = AccountsDB(db2)
@@ -32,10 +29,8 @@ if __name__ == "__main__":
     # Update current node list from @fullnodeupdate
     nodes = NodeList()
     nodes.update_nodes()
-    # nodes.update_nodes(weights={"hist": 1})
     stm = Steem(node=nodes.get_nodes(hive=hive_blockchain))
-    # print(str(stm))
-    
+
     print("Check account history ops.")
     
     blockchain = Blockchain(steem_instance=stm)
@@ -49,9 +44,6 @@ if __name__ == "__main__":
     # temp
     accountTrx["sbi"] = AccountTrx(db, "sbi")
 
-    # stop_index = addTzInfo(datetime(2018, 7, 21, 23, 46, 00))
-    # stop_index = formatTimeString("2018-07-21T23:46:09")
-    
     ops1 = accountTrx["steembasicincome"].get_all(op_types=["transfer", "delegate_vesting_shares"])
     
     ops2 = accountTrx["sbi"].get_all(op_types=["transfer", "delegate_vesting_shares"])

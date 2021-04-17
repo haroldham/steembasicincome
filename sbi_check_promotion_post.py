@@ -30,7 +30,6 @@ if __name__ == "__main__":
     else:
         with open(config_file) as json_data_file:
             config_data = json.load(json_data_file)
-        # print(config_data)
         accounts = config_data["accounts"]
         path = config_data["path"]
         database = config_data["database"]
@@ -75,7 +74,6 @@ if __name__ == "__main__":
         last_cycle = datetime.utcnow() - timedelta(seconds = 60 * 145)
         confStorage.update({"last_cycle": last_cycle})        
         print("update member database")
-        # memberStorage.wipe(True)
         member_accounts = memberStorage.get_all_accounts()
         data = trxStorage.get_all_data()
         
@@ -85,7 +83,6 @@ if __name__ == "__main__":
         nodes = NodeList()
         nodes.update_nodes()
         stm = Steem(node=nodes.get_nodes(hive=hive_blockchain))    
-        # stm = Steem()
         member_data = {}
         n_records = 0
         share_age_member = {}    

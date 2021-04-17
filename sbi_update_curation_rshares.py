@@ -22,7 +22,6 @@ if __name__ == "__main__":
     else:
         with open(config_file) as json_data_file:
             config_data = json.load(json_data_file)
-        # print(config_data)
         accounts = config_data["accounts"]
         databaseConnector = config_data["databaseConnector"]
         databaseConnector2 = config_data["databaseConnector2"]
@@ -37,7 +36,6 @@ if __name__ == "__main__":
     trxStorage = TrxDB(db2)
     keyStorage = KeysDB(db2)
     memberStorage = MemberDB(db2)
-    # accountStorage = MemberHistDB(db)
     confStorage = ConfigurationDB(db2)
     transactionStorage = TransactionMemoDB(db2)
 
@@ -82,11 +80,9 @@ if __name__ == "__main__":
         
         
         print("Update member database, new cycle: %s" % str(new_cycle))
-        # memberStorage.wipe(True)
         member_accounts = memberStorage.get_all_accounts()
 
         
-        #print(key_list)
         nodes = NodeList()
         nodes.update_nodes()
         stm = Steem(node=nodes.get_nodes(hive=hive_blockchain))
@@ -101,15 +97,12 @@ if __name__ == "__main__":
 
         if True:    
             print("reward voted steembasicincome post and comments")
-            # account = Account("steembasicincome", steem_instance=stm)
-            
+
             if last_paid_post is None:
                 last_paid_post = datetime(2018, 8, 9, 3, 36, 48)
             new_paid_post = last_paid_post
             if last_paid_comment is None:
                 last_paid_comment = datetime(2018, 8, 9, 3, 36, 48)
-            # elif (datetime.utcnow() - last_paid_comment).total_seconds() / 60 / 60 / 24 < 6.5:
-            #    last_paid_comment = datetime.utcnow() - timedelta(days=7)
             new_paid_comment = last_paid_comment
             
             for account in accounts:

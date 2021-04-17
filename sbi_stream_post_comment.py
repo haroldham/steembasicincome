@@ -22,7 +22,6 @@ if __name__ == "__main__":
     else:
         with open(config_file) as json_data_file:
             config_data = json.load(json_data_file)
-        # print(config_data)
         databaseConnector = config_data["databaseConnector"]
         databaseConnector2 = config_data["databaseConnector2"]
         hive_blockchain = config_data["hive_blockchain"]
@@ -69,7 +68,6 @@ if __name__ == "__main__":
     print("%d members in list" % len(member_accounts)) 
     
     nobroadcast = False
-    # nobroadcast = True    
 
     member_data = {}
     for m in member_accounts:
@@ -103,7 +101,6 @@ if __name__ == "__main__":
         appbase = True        
 
     nodes = NodeList()
-    # nodes.update_nodes(weights={"block": 1})
     try:
         nodes.update_nodes()
     except:
@@ -124,7 +121,6 @@ if __name__ == "__main__":
     b = Blockchain(steem_instance = stm)
     print("deleting old posts")
     postTrx.delete_old_posts(1)
-    # print("reading all authorperm")
     already_voted_posts = []
     flagged_posts = []
     start_block = b.get_current_block_num() - int(28800)
@@ -151,10 +147,7 @@ if __name__ == "__main__":
     posts_dict = {}
     changed_member_data = []
     for ops in b.stream(start=start_block, stop=stop_block, opNames=["comment"], max_batch_size=max_batch_size, threading=threading, thread_num=8):
-        #print(ops)
         timestamp = ops["timestamp"]
-        # timestamp = timestamp.replace(tzinfo=None)
-            # continue
         if ops["author"] not in member_accounts:
             continue
         if ops["block_num"] <= latest_update_block:
@@ -230,10 +223,6 @@ if __name__ == "__main__":
             
                 
         already_voted = False
-    
-        #for v in c["active_votes"]:
-        #    if v["voter"] in accounts:
-        #        already_voted = True
                   
         dt_created = c["created"]
         dt_created = dt_created.replace(tzinfo=None)

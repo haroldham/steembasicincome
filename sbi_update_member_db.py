@@ -119,7 +119,6 @@ if __name__ == "__main__":
     else:
         with open(config_file) as json_data_file:
             config_data = json.load(json_data_file)
-        # print(config_data)
         accounts = config_data["accounts"]
         databaseConnector = config_data["databaseConnector"]
         databaseConnector2 = config_data["databaseConnector2"]
@@ -134,7 +133,6 @@ if __name__ == "__main__":
     trxStorage = TrxDB(db2)
     keyStorage = KeysDB(db2)
     memberStorage = MemberDB(db2)
-    # accountStorage = MemberHistDB(db)
     confStorage = ConfigurationDB(db2)
     transactionStorage = TransactionMemoDB(db2)
 
@@ -181,7 +179,6 @@ if __name__ == "__main__":
         
         
         print("Update member database, new cycle: %s" % str(new_cycle))
-        # memberStorage.wipe(True)
         member_accounts = memberStorage.get_all_accounts()
         data = trxStorage.get_all_data()
         
@@ -204,7 +201,6 @@ if __name__ == "__main__":
         for db_entry in transferMemosStorage.get_all_data():
             transferMemos[db_entry["memo_type"]] = {"enabled": db_entry["enabled"], "memo": db_entry["memo"]}
         
-        #print(key_list)
         nodes = NodeList()
         nodes.update_nodes()
         stm = Steem(keys=keys_list, node=nodes.get_nodes(hive=hive_blockchain))
@@ -268,7 +264,6 @@ if __name__ == "__main__":
                     elif op["vests"] > 0 and op["sponsor"] in member_data:
                         sp = stm.vests_to_sp(float(op["vests"]))
                         delegation[op["sponsor"]] = int(sp / sp_share_ratio)
-                    # memo_sp_delegation(transferMemos, memo_transfer_acc, op["sponsor"], delegation[op["sponsor"]], sp_share_ratio)
                     delegation_timestamp[op["sponsor"]] = timestamp
                 elif share_type.lower() in ["removeddelegation"]:
                     delegation[op["sponsor"]] = 0
@@ -313,8 +308,7 @@ if __name__ == "__main__":
                     shares_sum += shares
                     for s in sponsee:
                         shares_sum += sponsee[s]
-                    # if (shares_sum - mngt_shares_sum) >= 100:
-                         
+
                     if sponsor not in member_data:
                         # Build and send transfer with memo to welcome new member
                         memo_welcome(transferMemos, memo_transfer_acc, sponsor, STEEM_symbol=stm.steem_symbol)
@@ -395,7 +389,6 @@ if __name__ == "__main__":
         
         print("latest data timestamp: %s - latest member enrollment %s" % (str(latest_data_timestamp), str(latest_enrollment)))
         
-        # date_now = datetime.utcnow()
         date_now = latest_enrollment
         date_7_before = addTzInfo(date_now - timedelta(seconds=7 * 24 * 60 * 60))
         date_28_before = addTzInfo(date_now - timedelta(seconds=28 * 24 * 60 * 60))
@@ -413,8 +406,7 @@ if __name__ == "__main__":
                 member_data[m]["subscribed_rshares"] += (member_data[m]["shares"] * rshares_per_cycle)
                 member_data[m]["delegation_rshares"] += (member_data[m]["bonus_shares"] * del_rshares_per_cycle)
 
-        #print("%d new curation rshares for posts" % post_rshares)
-        #print("%d new curation rshares for comments" % comment_rshares)
+
         print("write member database")
         memberStorage.db = dataset.connect(databaseConnector2)
         member_data_list = []

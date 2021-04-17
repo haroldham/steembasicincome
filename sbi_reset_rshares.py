@@ -26,7 +26,6 @@ if __name__ == "__main__":
     else:
         with open(config_file) as json_data_file:
             config_data = json.load(json_data_file)
-        # print(config_data)
         accounts = config_data["accounts"]
         databaseConnector = config_data["databaseConnector"]
         databaseConnector2 = config_data["databaseConnector2"]
@@ -73,7 +72,6 @@ if __name__ == "__main__":
         nodes = NodeList()
         nodes.update_nodes()
         stm = Steem(node=nodes.get_nodes(hive=hive_blockchain))    
-        # stm = Steem()
         member_data = {}
         n_records = 0
         share_age_member = {}    

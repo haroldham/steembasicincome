@@ -21,7 +21,6 @@ if __name__ == "__main__":
     else:
         with open(config_file) as json_data_file:
             config_data = json.load(json_data_file)
-        # print(config_data)
         databaseConnector = config_data["databaseConnector"]
         databaseConnector2 = config_data["databaseConnector2"]
         hive_blockchain = config_data["hive_blockchain"]
@@ -51,14 +50,12 @@ if __name__ == "__main__":
     member_accounts = memberStorage.get_all_accounts()
     
     nobroadcast = False
-    # nobroadcast = True
     
     upvote_counter = {}
     
     for m in member_accounts:
         upvote_counter[m] = 0
     
-    # print("%d members in list" % len(member_accounts))    
     postTrx = PostsTrx(db)
 
     print("Upvote posts/comments")
@@ -88,7 +85,6 @@ if __name__ == "__main__":
         appbase = True        
 
     nodes = NodeList()
-    # nodes.update_nodes(weights={"block": 1})
     try:
         nodes.update_nodes()
     except:
@@ -110,14 +106,11 @@ if __name__ == "__main__":
         voter_accounts[acc] = Account(acc, steem_instance=stm)    
     
     b = Blockchain(steem_instance = stm)
-    # print("reading all authorperm")
     already_voted_posts = []
     flagged_posts = []
     rshares_sum = 0
     start_reading = time.time()
     post_list = postTrx.get_unvoted_post()
-    #print("Reading posts from database took %.2f s" % (time.time() - start_prep_time))
-    # print("prep time took %.2f s" % (time.time() - start_prep_time))
     for authorperm in post_list:
 
         created = post_list[authorperm]["created"]
@@ -134,7 +127,6 @@ if __name__ == "__main__":
             postTrx.update_comment_to_old(author, created, True)
 
         member = Member(memberStorage.get(author))
-#        if member["comment_upvote"] == 0 and post_list[authorperm]["main_post"] == 0:
         if post_list[authorperm]["main_post"] == 0:
             continue
         if member["blacklisted"]:
